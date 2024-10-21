@@ -13,7 +13,8 @@
 ##API curl Documentation
 1) curl request to upload the XML file:
 curl --location 'http://localhost:8080/api/epaper/upload' \
---form 'file=@"/C:/Users/pca64/Desktop/test.xml"'
+--form 'file=@"${XMLFileLocation}"'
+Note: replace this `${XMLFileLocation}` with path of your XML File.
 
 Here for all of the below requests,all the request parameters have default values i.e pageSize has 10 as default value, pageNumber has 0 as default value, sort has uploadTime as default value and descending has false as default value:
 
