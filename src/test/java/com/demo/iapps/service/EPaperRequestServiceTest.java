@@ -1,11 +1,15 @@
 package com.demo.iapps.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,8 +23,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.demo.iapps.data.FilterType;
 import com.demo.iapps.entity.EPaperRequest;
+import com.demo.iapps.exception.InvalidFilterTypeException;
+import com.demo.iapps.exception.NoRecordFoundException;
 import com.demo.iapps.repository.EPaperRequestRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,8 +41,11 @@ public class EPaperRequestServiceTest {
 	@Mock
 	private EPaperRequestRepository repo;
 	
+	@Mock
+	private XMLService xmlService;
+	
 	@Test
-	public void test_save() {
+	public void test_save() throws Exception {
 		EPaperRequest request = new EPaperRequest();
 		request.setDpi(160);
 		request.setFileName("test.xml");
@@ -42,31 +54,17 @@ public class EPaperRequestServiceTest {
 		request.setUploadTime(LocalDateTime.now());
 		request.setWidth(1280);
 		request.setId(1l);
+		File file = new File("src/main/resources/correct.xml");
+		InputStream ins = new FileInputStream(file);
+		MultipartFile multiPartFile = new MockMultipartFile("file", file.getName(), "application/xml", ins);
 		when(repo.save(any(EPaperRequest.class))).thenReturn(request);
-		assertEquals(request, service.save(request));
+		when(xmlService.parseXML(any(File.class))).thenReturn(request);
+		assertEquals(request, service.save(multiPartFile));
 	}
 	
 	@Test
-	public void test_findAll_descendingTrue() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_findAll_descendingTrue() throws NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		Collections.sort(list, (r1,r2) -> r2.getUploadTime().compareTo(r1.getUploadTime()));
 		when(repo.findAll(any(Pageable.class))).thenReturn(new PageImpl<EPaperRequest>(list, PageRequest.of(0, 2), 2));
 		assertEquals(list,service.findAll(2, 0, "uploadTime", true));
@@ -74,241 +72,113 @@ public class EPaperRequestServiceTest {
 	}
 	
 	@Test
-	public void test_findAll_descendingFalse() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_findAll_descendingFalse() throws NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		when(repo.findAll(any(Pageable.class))).thenReturn(new PageImpl<EPaperRequest>(list, PageRequest.of(0, 2), 2));
 		assertEquals(list,service.findAll(2, 0, "uploadTime", false));
 		
 	}
 	
 	@Test
-	public void test_findByNewspaperName_descendingFalse() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_find_newspaperName_descendingFalse() throws InvalidFilterTypeException, NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		when(repo.findByNewspaperName(anyString(), any(Pageable.class))).thenReturn(list);
-		assertEquals(list,service.findByNewspaperName("a",2, 0, "uploadTime", false));
+		assertEquals(list,service.find(FilterType.NEWSPAPERNAME.name(),"a",2, 0, "uploadTime", false));
 		
 	}
 	
 	@Test
-	public void test_findByNewspaperName_descendingTrue() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_find_newspaperName_descendingTrue() throws InvalidFilterTypeException, NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		Collections.sort(list, (r1,r2) -> r2.getUploadTime().compareTo(r1.getUploadTime()));
 		when(repo.findByNewspaperName(anyString(), any(Pageable.class))).thenReturn(list);
-		assertEquals(list,service.findByNewspaperName("a",2, 0, "uploadTime", true));
+		assertEquals(list,service.find(FilterType.NEWSPAPERNAME.name(),"a",2, 0, "uploadTime", true));
 		
 	}
 	
 	@Test
-	public void test_findByHeight_descendingFalse() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_find_height_descendingFalse() throws InvalidFilterTypeException, NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		when(repo.findByHeight(anyInt(), any(Pageable.class))).thenReturn(list);
-		assertEquals(list,service.findByHeight(752,2, 0, "uploadTime", false));
+		assertEquals(list,service.find(FilterType.HEIGHT.name(),"752",2, 0, "uploadTime", false));
 		
 	}
 	
 	@Test
-	public void test_findByHeight_descendingTrue() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_find_height_descendingTrue() throws InvalidFilterTypeException, NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		Collections.sort(list, (r1,r2) -> r2.getUploadTime().compareTo(r1.getUploadTime()));
 		when(repo.findByHeight(anyInt(), any(Pageable.class))).thenReturn(list);
-		assertEquals(list,service.findByHeight(752,2, 0, "uploadTime", true));
+		assertEquals(list,service.find(FilterType.HEIGHT.name(),"752",2, 0, "uploadTime", true));
 		
 	}
 	
 	@Test
-	public void test_findByDpi_descendingFalse() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_find_dpi_descendingFalse() throws InvalidFilterTypeException, NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		when(repo.findByDpi(anyInt(), any(Pageable.class))).thenReturn(list);
-		assertEquals(list,service.findByDpi(160,2, 0, "uploadTime", false));
+		assertEquals(list,service.find(FilterType.DPI.name(),"160",2, 0, "uploadTime", false));
 		
 	}
 	
 	@Test
-	public void test_findByDpi_descendingTrue() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_find_dpi_descendingTrue() throws InvalidFilterTypeException, NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		Collections.sort(list, (r1,r2) -> r2.getUploadTime().compareTo(r1.getUploadTime()));
 		when(repo.findByDpi(anyInt(), any(Pageable.class))).thenReturn(list);
-		assertEquals(list,service.findByDpi(160,2, 0, "uploadTime", true));
+		assertEquals(list,service.find(FilterType.DPI.name(),"160",2, 0, "uploadTime", true));
 		
 	}
 	
 	@Test
-	public void test_findByWidth_descendingFalse() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_find_width_descendingFalse() throws InvalidFilterTypeException, NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		when(repo.findByWidth(anyInt(), any(Pageable.class))).thenReturn(list);
-		assertEquals(list,service.findByWidth(1280,2, 0, "uploadTime", false));
+		assertEquals(list,service.find(FilterType.WIDTH.name(),"1280",2, 0, "uploadTime", false));
 		
 	}
 	
 	@Test
-	public void test_findByWidth_descendingTrue() {
-		List<EPaperRequest> list = new ArrayList<>();
-		EPaperRequest request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(1l);
-		list.add(request);
-		request = new EPaperRequest();
-		request.setDpi(160);
-		request.setFileName("test.xml");
-		request.setHeight(752);
-		request.setNewspaperName("a");
-		request.setUploadTime(LocalDateTime.now());
-		request.setWidth(1280);
-		request.setId(2l);
-		list.add(request);
+	public void test_find_width_descendingTrue() throws InvalidFilterTypeException, NoRecordFoundException {
+		List<EPaperRequest> list = prepareListData();
 		Collections.sort(list, (r1,r2) -> r2.getUploadTime().compareTo(r1.getUploadTime()));
 		when(repo.findByWidth(anyInt(), any(Pageable.class))).thenReturn(list);
-		assertEquals(list,service.findByWidth(1280,2, 0, "uploadTime", true));
+		assertEquals(list,service.find(FilterType.WIDTH.name(),"1280",2, 0, "uploadTime", true));
 		
+	}
+	
+	@Test
+	public void test_find_InvalidFilterTypeException(){
+		assertThrows(InvalidFilterTypeException.class, () -> service.find("invalid","1280",2, 0, "uploadTime", true));
+	}
+	
+	@Test
+	public void test_findAll_listEmpty_NoRecordFoundException(){
+		when(repo.findAll(any(Pageable.class))).thenReturn(new PageImpl<EPaperRequest>(new ArrayList<>(), PageRequest.of(0, 2), 2));
+		assertThrows(NoRecordFoundException.class, () -> service.findAll(2, 0, "uploadTime", false));
+	}
+	
+	private List<EPaperRequest> prepareListData(){
+		List<EPaperRequest> list = new ArrayList<>();
+		EPaperRequest request = new EPaperRequest();
+		request.setDpi(160);
+		request.setFileName("test.xml");
+		request.setHeight(752);
+		request.setNewspaperName("a");
+		request.setUploadTime(LocalDateTime.now());
+		request.setWidth(1280);
+		request.setId(1l);
+		list.add(request);
+		request = new EPaperRequest();
+		request.setDpi(160);
+		request.setFileName("test.xml");
+		request.setHeight(752);
+		request.setNewspaperName("a");
+		request.setUploadTime(LocalDateTime.now());
+		request.setWidth(1280);
+		request.setId(2l);
+		list.add(request);
+		return list;
 	}
 
 }

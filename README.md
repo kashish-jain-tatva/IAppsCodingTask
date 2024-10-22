@@ -22,13 +22,13 @@ Here for all of the below requests,all the request parameters have default value
 curl --location 'http://localhost:8080/api/epaper/getAll?pageSize=10&pageNumber=0&sort=uploadTime&descending=true'
 
 3) curl request to get all records by width
-curl --location 'http://localhost:8080/api/epaper/getByWidth/1280?pageSize=10&pageNumber=0&sort=uploadTime&descending=true'
+curl --location 'http://localhost:8080/api/epaper/get/Width/1280?pageSize=10&pageNumber=0&sort=uploadTime&descending=true'
 
 4) curl request to get all records by height
-curl --location 'http://localhost:8080/api/epaper/getByHeight/752?pageSize=10&pageNumber=0&sort=uploadTime&descending=true'
+curl --location 'http://localhost:8080/api/epaper/get/Height/752?pageSize=10&pageNumber=0&sort=uploadTime&descending=true'
 
 5) curl request to get all records by dpi
-curl --location 'http://localhost:8080/api/epaper/getByDpi/160?pageSize=10&pageNumber=0&sort=uploadTime&descending=true'
+curl --location 'http://localhost:8080/api/epaper/get/Dpi/160?pageSize=10&pageNumber=0&sort=uploadTime&descending=true'
 
 6) curl request to get all records by newspaper name
-curl --location 'http://localhost:8080/api/epaper/getByNewspaperName/a?pageSize=10&pageNumber=0&sort=uploadTime&descending=true'
+curl --location 'http://localhost:8080/api/epaper/get/NewspaperName/a?pageSize=10&pageNumber=0&sort=uploadTime&descending=true'
