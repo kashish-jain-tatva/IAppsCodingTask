@@ -4,10 +4,10 @@ services:
   db:
     image: mysql:8.0.27
     environment:
-      - DATABASE_HOST=docker-mysql
-      - DATABASE_PORT=3306
       - MYSQL_ROOT_PASSWORD=Root@1234
       - MYSQL_DATABASE=epaper
+  ports:
+      - "3306:3306"
   app:
     image: iappscodingtask:1.0
     ports:
