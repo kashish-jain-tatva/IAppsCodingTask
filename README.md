@@ -1,12 +1,12 @@
 [Pre-requisites]: java 17 should be installed and mysql database named epaper should be created.
 
 ##building and running the application with maven and java
-1. command to install the application: "./mvnw clean install"
+1. command to install the application: "mvn clean install"
 2. go to target folder and then open cmd and run command "java -jar IAppsCodingTask-0.0.1-SNAPSHOT.jar"
 
 ##using Docker to run the application
-1. command to install the application: "./mvnw clean install"
-2. Run command "docker build -t IAppsCodingTask:1.0 ." in the root directory of project.
+1. command to install the application: "mvn clean install"
+2. Run command "docker build -t iappscodingtask:1.0 ." in the root directory of project.
 3. Run command "docker-compose up" in the same directory and wait for the application to start up.
 
 

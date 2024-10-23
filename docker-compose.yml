@@ -6,7 +6,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=Root@1234
       - MYSQL_DATABASE=epaper
-  ports:
+    ports:
       - "3306:3306"
   app:
     image: iappscodingtask:1.0
