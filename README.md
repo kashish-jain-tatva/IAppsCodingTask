@@ -1,6 +1,6 @@
-##building and running the application with maven and java
+[Pre-requisites]: java 17 should be installed and mysql database named epaper should be created.
 
-[Pre-requisites]: java 17 should be installed.
+##building and running the application with maven and java
 1. command to install the application: "./mvnw clean install"
 2. go to target folder and then open cmd and run command "java -jar IAppsCodingTask-0.0.1-SNAPSHOT.jar"
 
