@@ -1,8 +1,12 @@
 package com.demo.iapps.service;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.List;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -19,17 +23,29 @@ public class EPaperRequestService {
 	
 	private final EPaperRequestRepository repo;
 	private final XMLService xmlService;
+	private ResourceLoader resourceLoader;
 	
-	public EPaperRequestService(EPaperRequestRepository repo,XMLService xmlService) {
+	public EPaperRequestService(EPaperRequestRepository repo,XMLService xmlService, ResourceLoader resourceLoader) {
 		this.repo = repo;
 		this.xmlService = xmlService;
+		this.resourceLoader = resourceLoader;
 	}
 	
 	public EPaperRequest save(MultipartFile file) throws Exception{
 		File xmlFile = File.createTempFile(file.getOriginalFilename().substring(0, file.getOriginalFilename().indexOf(".xml") + 1 ), ".xml");
         file.transferTo(xmlFile);
         // Validate XML
-        File xsdFile = new File("src/main/resources/schema.xsd");
+        Resource resource = resourceLoader.getResource("classpath:schema.xsd");
+        File xsdFile = File.createTempFile("schema", ".xsd");
+
+        try (InputStream inputStream = resource.getInputStream();
+             FileOutputStream outputStream = new FileOutputStream(xsdFile)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
         xmlService.validateXml(xmlFile, xsdFile);
         EPaperRequest request = xmlService.parseXML(xmlFile);
 		return repo.save(request);

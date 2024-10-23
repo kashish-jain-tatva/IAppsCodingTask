@@ -1,4 +1,4 @@
-[Pre-requisites]: java 17 should be installed and mysql database named epaper should be created.
+[Pre-requisites]: java 17 should be installed and mysql database named epaper should be created and update the database password in application.properties to your password.
 
 ##building and running the application with maven and java
 1. command to install the application: "mvn clean install"
