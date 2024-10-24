@@ -1,10 +1,14 @@
 package com.demo.iapps.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -20,6 +24,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +50,12 @@ public class EPaperRequestServiceTest {
 	@Mock
 	private XMLService xmlService;
 	
+	@Mock
+	private ResourceLoader resourceLoader;
+	
+	@Mock
+	private Resource resource;
+	
 	@Test
 	public void test_save() throws Exception {
 		EPaperRequest request = new EPaperRequest();
@@ -54,14 +66,17 @@ public class EPaperRequestServiceTest {
 		request.setUploadTime(LocalDateTime.now());
 		request.setWidth(1280);
 		request.setId(1l);
-		File file = new File("src/main/resources/correct.xml");
-		InputStream ins = new FileInputStream(file);
-		MultipartFile multiPartFile = new MockMultipartFile("file", file.getName(), "application/xml", ins);
+		File file = mock(File.class);
+		when(file.getName()).thenReturn("mockfile.xml");
+		 MockMultipartFile mockFile = new MockMultipartFile("file", file.getName(), "application/xml",getClass().getResourceAsStream("/correct.xml") );
+		when(resourceLoader.getResource(anyString())).thenReturn(resource);
+        when(resource.getInputStream()).thenReturn(getClass().getResourceAsStream("/schema.xsd"));
+        when(xmlService.parseXML(any(File.class))).thenReturn(request);
 		when(repo.save(any(EPaperRequest.class))).thenReturn(request);
-		when(xmlService.parseXML(any(File.class))).thenReturn(request);
-		assertEquals(request, service.save(multiPartFile));
+		assertEquals(request, service.save(mockFile));
 	}
 	
+	  
 	@Test
 	public void test_findAll_descendingTrue() throws NoRecordFoundException {
 		List<EPaperRequest> list = prepareListData();
