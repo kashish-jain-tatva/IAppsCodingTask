@@ -22,24 +22,25 @@ import com.demo.iapps.entity.EPaperRequest;
 
 @Service
 public class XMLService {
-	
+
 	public void validateXml(File xmlFile, File xsdFile) throws SAXException, IOException {
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(xsdFile);
-        Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(xmlFile));
-    }
-	
+		SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		Schema schema = factory.newSchema(xsdFile);
+		Validator validator = schema.newValidator();
+		validator.validate(new StreamSource(xmlFile));
+	}
+
 	public EPaperRequest parseXML(File xmlFile) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder newDocumentBuilder = factory.newDocumentBuilder();
-		Document doc = newDocumentBuilder.parse(xmlFile);
+		Document document = newDocumentBuilder.parse(xmlFile);
 		EPaperRequest request = new EPaperRequest();
-		NamedNodeMap attributes2 = doc.getElementsByTagName("screenInfo").item(0).getAttributes();
-		request.setWidth(Integer.parseInt(attributes2.getNamedItem("width").getTextContent()));
-		request.setHeight(Integer.parseInt(attributes2.getNamedItem("height").getTextContent()));
-		request.setDpi(Integer.parseInt(attributes2.getNamedItem("dpi").getTextContent()));
-		request.setNewspaperName(doc.getElementsByTagName("newspaperName").item(0).getTextContent());
+		// getting the tag named screenInfo 
+		NamedNodeMap nodeMap = document.getElementsByTagName("screenInfo").item(0).getAttributes();
+		request.setWidth(Integer.parseInt(nodeMap.getNamedItem("width").getTextContent()));
+		request.setHeight(Integer.parseInt(nodeMap.getNamedItem("height").getTextContent()));
+		request.setDpi(Integer.parseInt(nodeMap.getNamedItem("dpi").getTextContent()));
+		request.setNewspaperName(document.getElementsByTagName("newspaperName").item(0).getTextContent()); // getting the tag named newspaperName
 		request.setFileName(xmlFile.getName());
 		request.setUploadTime(LocalDateTime.now());
 		return request;

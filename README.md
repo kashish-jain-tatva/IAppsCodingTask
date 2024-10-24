@@ -7,7 +7,7 @@
 ##using Docker to run the application
 1. command to install the application: "mvn clean install"
 2. Run command "docker build -t iappscodingtask:1.0 ." in the root directory of project.
-3. Run command "docker-compose up" in the same directory and wait for the application to start up.
+3. Run command "docker-compose up" in the same directory and wait for the application to start up. [Note: if docker-compose command is not working try using docker compose]
 
 
 ##API curl Documentation

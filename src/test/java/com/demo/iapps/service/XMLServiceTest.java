@@ -20,20 +20,22 @@ import com.demo.iapps.entity.EPaperRequest;
 
 @ExtendWith(MockitoExtension.class)
 public class XMLServiceTest {
-	
+
 	@InjectMocks
 	private XMLService service;
-	
+
 	@Test
 	public void test_correctXML_validateXML() throws SAXException, IOException {
-		assertDoesNotThrow(() -> service.validateXml(new File("src/main/resources/correct.xml"), new File("src/main/resources/schema.xsd")));	
+		assertDoesNotThrow(() -> service.validateXml(new File("src/main/resources/correct.xml"),
+				new File("src/main/resources/schema.xsd")));
 	}
-	
+
 	@Test
 	public void test_incorrectXML_validateXML() throws SAXException, IOException {
-		assertThrows(SAXParseException.class, () -> service.validateXml(new File("src/main/resources/incorrect.xml"), new File("src/main/resources/schema.xsd")));
+		assertThrows(SAXParseException.class, () -> service.validateXml(new File("src/main/resources/incorrect.xml"),
+				new File("src/main/resources/schema.xsd")));
 	}
-	
+
 	@Test
 	public void test_parseXML() throws SAXException, IOException, ParserConfigurationException {
 		EPaperRequest request = new EPaperRequest();
@@ -46,7 +48,7 @@ public class XMLServiceTest {
 		assertEquals(request.getHeight(), ePaperRequest.getHeight());
 		assertEquals(request.getNewspaperName(), ePaperRequest.getNewspaperName());
 		assertEquals(request.getWidth(), ePaperRequest.getWidth());
-		
+
 	}
 
 }

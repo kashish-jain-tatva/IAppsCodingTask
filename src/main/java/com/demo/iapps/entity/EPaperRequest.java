@@ -23,6 +23,6 @@ public class EPaperRequest {
     private int height;
     private int dpi;
     private LocalDateTime uploadTime;
-    private String fileName;
+	private String fileName;
 
 }

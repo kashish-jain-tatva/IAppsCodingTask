@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum FilterType {
-	
+
 	WIDTH("width"), HEIGHT("height"), DPI("dpi"), NEWSPAPERNAME("newspapername");
-	
+
 	private final String type;
 
 }
