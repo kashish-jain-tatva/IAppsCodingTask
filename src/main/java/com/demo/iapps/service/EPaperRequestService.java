@@ -48,6 +48,7 @@ public class EPaperRequestService {
         }
         xmlService.validateXml(xmlFile, xsdFile);
         EPaperRequest request = xmlService.parseXML(xmlFile);
+        request.setFileName(file.getOriginalFilename());
 		return repo.save(request);
 	}
 	
