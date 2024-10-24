@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -137,15 +139,10 @@ public class EPaperRequestService {
 		try {
 			filterType = FilterType.valueOf(type.toUpperCase());
 		} catch (Exception e) {
-			FilterType[] values = FilterType.values();
-			StringBuilder builder = new StringBuilder();
-			for (FilterType filter : values) {
-				builder.append(filter.getType() + ", ");
-			}
-			logger.error(
-					"invalid type value provided, possible values are: " + builder.substring(0, builder.length() - 2));
-			throw new InvalidFilterTypeException(
-					"Invalid value for type, possible values are: " + builder.substring(0, builder.length() - 2));
+			String possibleFilters = Arrays.stream(FilterType.values()).map(FilterType::getType)
+					.collect(Collectors.joining(", "));
+			logger.error("invalid type value provided, possible values are: " + possibleFilters);
+			throw new InvalidFilterTypeException("Invalid value for type, possible values are: " + possibleFilters);
 		}
 		List<EPaperRequest> list = null;
 		switch (filterType) {

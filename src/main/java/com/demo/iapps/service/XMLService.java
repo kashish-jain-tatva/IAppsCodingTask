@@ -2,7 +2,6 @@ package com.demo.iapps.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -42,7 +41,6 @@ public class XMLService {
 		request.setDpi(Integer.parseInt(nodeMap.getNamedItem("dpi").getTextContent()));
 		request.setNewspaperName(document.getElementsByTagName("newspaperName").item(0).getTextContent()); // getting the tag named newspaperName
 		request.setFileName(xmlFile.getName());
-		request.setUploadTime(LocalDateTime.now());
 		return request;
 	}
 

@@ -2,6 +2,8 @@ package com.demo.iapps.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,16 +15,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity(name = "e_paper_request")
 public class EPaperRequest {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	private String newspaperName;
-    private int width;
-    private int height;
-    private int dpi;
-    private LocalDateTime uploadTime;
+	private int width;
+	private int height;
+	private int dpi;
+	@CreationTimestamp
+	private LocalDateTime uploadTime;
 	private String fileName;
 
 }

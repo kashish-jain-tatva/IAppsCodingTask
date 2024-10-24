@@ -12,13 +12,14 @@ import org.xml.sax.SAXParseException;
 
 import com.demo.iapps.exception.InvalidFilterTypeException;
 import com.demo.iapps.exception.InvalidInputFileException;
+import com.demo.iapps.exception.InvalidSortValueException;
 import com.demo.iapps.exception.NoRecordFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(value = { SAXParseException.class, InvalidFilterTypeException.class, IOException.class,
-			ParserConfigurationException.class, InvalidInputFileException.class })
+			ParserConfigurationException.class, InvalidInputFileException.class, InvalidSortValueException.class })
 	public ResponseEntity<Object> handleBadRequestExceptions(Exception ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
 	}
