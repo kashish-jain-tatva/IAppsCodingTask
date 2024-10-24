@@ -28,12 +28,8 @@ public class EPaperRequestController {
 	}
 	
 	@PostMapping("/upload")
-	public ResponseEntity<String> uploadFile(@RequestPart(name = "file") MultipartFile file) {
-        try {
-			service.save(file);
-		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
-		}
+	public ResponseEntity<String> uploadFile(@RequestPart(name = "file") MultipartFile file) throws Exception {
+        service.save(file);
 		return ResponseEntity.ok("File uploaded successfully");
 	}
 	

@@ -22,7 +22,13 @@
               <xs:element name="appInfo">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="newspaperName" type="xs:string" />
+                    <xs:element name="newspaperName">
+				      <xs:simpleType>
+				        <xs:restriction base="xs:string">
+				          <xs:minLength value="1" />
+				        </xs:restriction>
+				      </xs:simpleType>
+				    </xs:element>
                     <xs:element name="version" type="xs:decimal" />
                   </xs:sequence>
                 </xs:complexType>

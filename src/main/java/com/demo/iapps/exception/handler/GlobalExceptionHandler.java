@@ -1,5 +1,9 @@
 package com.demo.iapps.exception.handler;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,7 +16,8 @@ import com.demo.iapps.exception.NoRecordFoundException;
 public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(value = SAXParseException.class)
-	public ResponseEntity<Object> handleBadCredentialsException(SAXParseException ex){
+	public ResponseEntity<Object> handleSAXParseException(SAXParseException ex){
+		System.out.println(ex);
 		return ResponseEntity.status(400).body(ex.getMessage());
 	}
 	
@@ -29,6 +34,16 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(value = NumberFormatException.class)
 	public ResponseEntity<Object> handleNumberFormatException(NumberFormatException ex){
 		return ResponseEntity.status(400).body("Error occured while parsing: "+ex.getMessage()+ " please provide a proper number in path variable");
+	}
+	
+	@ExceptionHandler(value = IOException.class)
+	public ResponseEntity<Object> handleIOException(IOException ex){
+		return ResponseEntity.status(400).body(ex.getMessage());
+	}
+	
+	@ExceptionHandler(value = ParserConfigurationException.class)
+	public ResponseEntity<Object> handleParserConfigurationException(ParserConfigurationException ex){
+		return ResponseEntity.status(400).body(ex.getMessage());
 	}
 
 }
